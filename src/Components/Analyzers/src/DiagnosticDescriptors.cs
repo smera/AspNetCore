@@ -46,5 +46,14 @@ namespace Microsoft.AspNetCore.Components.Analyzers
             DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
             description: new LocalizableResourceString(nameof(Resources.ComponentParametersShouldBePublic_Description), Resources.ResourceManager, typeof(Resources)));
+
+        public static readonly DiagnosticDescriptor ComponentParametersShouldNotBeReferencedOutsideOfComponents = new DiagnosticDescriptor(
+            "BL0005",
+            new LocalizableResourceString(nameof(Resources.ComponentParameterShouldNotBeReferencedOutsideOfComponents_Title), Resources.ResourceManager, typeof(Resources)),
+            new LocalizableResourceString(nameof(Resources.ComponentParameterShouldNotBeReferencedOutsideOfComponents_Format), Resources.ResourceManager, typeof(Resources)),
+            "Usage",
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true,
+            description: new LocalizableResourceString(nameof(Resources.ComponentParameterShouldNotBeReferencedOutsideOfComponents_Description), Resources.ResourceManager, typeof(Resources)));
     }
 }
