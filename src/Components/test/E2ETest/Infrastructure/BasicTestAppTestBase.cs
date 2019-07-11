@@ -8,7 +8,10 @@ using Microsoft.AspNetCore.E2ETesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace Microsoft.AspNetCore.Components.E2ETest.Infrastructure
 {
@@ -38,15 +41,38 @@ namespace Microsoft.AspNetCore.Components.E2ETest.Infrastructure
         protected SelectElement WaitUntilTestSelectorReady()
         {
             var elemToFind = By.CssSelector("#test-selector > select");
-            WaitUntilExists(elemToFind, timeoutSeconds: 30);
+            WaitUntilExists(elemToFind, timeoutSeconds: 30, throwOnError: true);
             return new SelectElement(Browser.FindElement(elemToFind));
         }
 
-        protected IWebElement WaitUntilExists(By findBy, int timeoutSeconds = 10)
+        protected IWebElement WaitUntilExists(By findBy, int timeoutSeconds = 10, bool throwOnError = false)
         {
+            List<LogEntry> errors = null;
             IWebElement result = null;
-            new WebDriverWait(Browser, TimeSpan.FromSeconds(timeoutSeconds))
-                .Until(driver => (result = driver.FindElement(findBy)) != null);
+            new WebDriverWait(Browser, TimeSpan.FromSeconds(timeoutSeconds)).Until(driver =>
+            {
+                if (throwOnError && Browser.Manage().Logs.AvailableLogTypes.Contains(LogType.Browser))
+                {
+                    // Fail-fast if any errors were logged to the console.
+                    var log = Browser.Manage().Logs.GetLog(LogType.Browser);
+                    if (log.Any(entry => entry.Level == LogLevel.Severe))
+                    {
+                        errors = log.Where(entry => entry.Level == LogLevel.Severe).ToList();
+                        return true;
+                    }
+                }
+
+                return (result = driver.FindElement(findBy)) != null;
+            });
+
+            if (errors != null)
+            {
+                var message =
+                    $"Encountered errors while looking for '{findBy}'." + Environment.NewLine +
+                    string.Join(Environment.NewLine, errors);
+                throw new XunitException(message);
+            }
+
             return result;
         }
     }
