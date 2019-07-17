@@ -357,9 +357,14 @@ try {
             /clp:NoSummary
     }
 
-    MSBuild $toolsetBuildProj `
-        /p:RepoRoot=$RepoRoot `
-        @MSBuildArguments
+    if (-not $Restore) {
+        & ./bxl.cmd
+    }
+    else {
+        MSBuild $toolsetBuildProj `
+            /p:RepoRoot=$RepoRoot `
+            @MSBuildArguments
+    }
 }
 catch {
     Write-Host $_.ScriptStackTrace

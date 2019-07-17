@@ -11,9 +11,13 @@ config({
 
             fileNameEntryPoints: [r`traversal.proj`],
 
-            //useLegacyProjectIsolation: true,
+            useLegacyProjectIsolation: true,
             allowProjectsToNotSpecifyTargetProtocol: true,
             keepProjectGraphFile: true,
+
+            globalProperties: Map.empty<string, string>()
+                .add("XunitConsole472Path", "$(NugetPackageRoot)xunit.runner.console\\2.4.1\\build\\..\\tools\\net472\\xunit.console.exe")
+                .add("XunitConsole472PathX86", "$(NugetPackageRoot)xunit.runner.console\\2.4.1\\build\\..\\tools\\net472\\xunit.console.x86.exe"),
 
             // environment: Map.empty<string, string>()
             //                 .add("RepoRoot", "G:\\src\\bxl.asptnetcore")
