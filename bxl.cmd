@@ -1,0 +1,1 @@
+g:\src\BuildXL\Out\Bin\Debug\Net472\bxl.exe /c:config.dsc /disableProcessRetryOnResourceExhaustion+

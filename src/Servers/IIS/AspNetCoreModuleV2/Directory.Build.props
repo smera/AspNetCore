@@ -1,0 +1,6 @@
+<Project>
+    <Import Project="G:\src\bxl.asptnetcore\Directory.Build.props"/>
+    <ItemGroup>
+        <ProjectReferenceTargets Include="Build" Targets="GetNativeManifest;Build;GetResolvedLinkLibs"/>
+    </ItemGroup>
+</Project>

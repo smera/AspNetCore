@@ -1,0 +1,91 @@
+<Project DefaultTargets="Build">
+
+	<PropertyGroup>
+		<RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
+	</PropertyGroup>
+
+	<ItemGroup>
+
+		<!-- These projects use 'legacy' csproj, which is not supported by dotnet-msbuild. -->
+		<ProjectToExclude Include="
+						$(RepoRoot)src\Components\Blazor\BlazorExtension\src\Microsoft.VisualStudio.BlazorExtension.csproj;
+						$(RepoRoot)src\Servers\HttpSys\samples\TestClient\TestClient.csproj;
+						$(RepoRoot)src\Middleware\WebSockets\samples\TestServer\WebSockets.TestServer.csproj;
+						"
+						Condition=" '$(MSBuildRuntimeType)' == 'Core' " />
+
+		<!-- Exclude the websockets samples for now because they use classic .csproj, which is not yet supported in our build. -->
+		<ProjectToExclude Include="$(RepoRoot)src\Middleware\WebSockets\samples\**\*.csproj" />
+
+		<!-- These projects are meant to be executed by tests. -->
+		<ProjectToExclude Include="
+						$(RepoRoot)src\Tools\dotnet-watch\test\TestProjects\**\*.csproj;
+						$(RepoRoot)src\Razor\Razor.Design\test\testassets\**\*.*proj;
+						$(RepoRoot)src\submodules\**\*.*proj;
+						$(RepoRoot)src\Installers\**\*.*proj;
+						$(RepoRoot)src\SignalR\clients\ts\**\node_modules\**\*.*proj;
+						$(RepoRoot)src\Components\Blazor\Templates\src\content\**\*.*proj;
+						$(RepoRoot)src\ProjectTemplates\Web.ProjectTemplates\content\**\*.csproj;
+						$(RepoRoot)src\ProjectTemplates\Web.ProjectTemplates\content\**\*.fsproj;
+						$(RepoRoot)src\ProjectTemplates\Web.Spa.ProjectTemplates\content\**\*.csproj;
+						" />
+
+		<!-- Exclude the benchmarks because they use <PackageReference>. -->
+		<ProjectToExclude Include="
+						$(RepoRoot)src\Mvc\benchmarkapps\**\*.csproj;
+						$(RepoRoot)src\Servers\Kestrel\perf\PlatformBenchmarks\**\*.csproj;
+						$(RepoRoot)src\SignalR\perf\benchmarkapps\**\*.csproj;
+						" />
+
+  </ItemGroup>
+
+	<ItemGroup>
+		<!-- In this traversal file we need to specify the target protocol ourselves-->
+		<ProjectReferenceTargets Include="Build" Targets="Build"/>
+
+		<ProjectReference Include="$(RepoRoot)src\**\*.vcxproj" Exclude="@(ProjectToExclude)">
+			<AdditionalProperties Condition="'$(TargetArchitecture)' == 'x64'">Platform=x64</AdditionalProperties>
+          	<AdditionalProperties Condition="'$(TargetArchitecture)' == 'x86'">Platform=Win32</AdditionalProperties>
+		</ProjectReference>
+
+
+		<DotNetProjects Include="
+                          $(RepoRoot)src\Framework\ref\Microsoft.AspNetCore.App.Ref.csproj;
+                          $(RepoRoot)src\Framework\src\Microsoft.AspNetCore.App.Runtime.csproj;
+                          $(RepoRoot)src\Framework\test\Microsoft.AspNetCore.App.UnitTests.csproj;
+                          $(RepoRoot)src\DefaultBuilder\**\*.*proj;
+                          $(RepoRoot)src\Features\JsonPatch\**\*.*proj;
+                          $(RepoRoot)src\DataProtection\**\*.*proj;
+                          $(RepoRoot)src\Antiforgery\**\*.*proj;
+                          $(RepoRoot)src\Hosting\**\*.*proj;
+                          $(RepoRoot)src\Http\**\*.*proj;
+                          $(RepoRoot)src\Html\**\*.*proj;
+                          $(RepoRoot)src\Identity\**\*.*proj;
+                          $(RepoRoot)src\Servers\**\*.csproj;
+                          $(RepoRoot)src\Security\**\*.*proj;
+                          $(RepoRoot)src\SiteExtensions\Microsoft.Web.Xdt.Extensions\**\*.csproj;
+                          $(RepoRoot)src\Shared\**\*.*proj;
+                          $(RepoRoot)src\Tools\**\*.*proj;
+                          $(RepoRoot)src\Middleware\**\*.csproj;
+                          $(RepoRoot)src\Razor\**\*.*proj;
+                          $(RepoRoot)src\Mvc\**\*.*proj;
+                          $(RepoRoot)src\Azure\**\*.*proj;
+                          $(RepoRoot)src\MusicStore\**\*.*proj;
+                          $(RepoRoot)src\SignalR\**\*.csproj;
+                          $(RepoRoot)src\Components\**\*.csproj;
+                          $(RepoRoot)src\Analyzers\**\*.csproj;
+                          $(RepoRoot)src\ProjectTemplates\*\*.csproj;
+                          $(RepoRoot)src\ProjectTemplates\testassets\*\*.csproj;
+                          "
+                        Exclude="
+                          @(ProjectToBuild);
+                          @(ProjectToExclude);
+                          $(RepoRoot)**\node_modules\**\*;
+                          $(RepoRoot)**\bin\**\*;
+                          $(RepoRoot)**\obj\**\*;" />
+
+		<ProjectReference Include="@(DotNetProjects)" Exclude="@(ProjectToExclude)"/>
+
+	</ItemGroup>
+	<Target Name="Build"/>
+</Project>
